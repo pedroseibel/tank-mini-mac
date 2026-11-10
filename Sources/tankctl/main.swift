@@ -42,6 +42,10 @@ func selftest() -> Bool {
         if i > 20 { maxStep = max(maxStep, abs(filter.cents - lastCents)) }
         lastCents = filter.cents
     }
+    // Note numbering per firmware: on 008 an open A reads 0 and low E reads 7; on 004 A reads 2 and D reads 7.
+    let name = { (raw: UInt8, fw: Int) in TunerReading.noteIndex(raw: raw, firmwareVersion: fw).map { TunerReading.noteNames[$0] } }
+    check("tuner notes on firmware 008", name(0, 8) == "A" && name(7, 8) == "E" && name(5, 8) == "D" && name(10, 8) == "G" && name(2, 8) == "B" && name(0xFF, 8) == nil)
+    check("tuner notes on firmware 004", name(2, 4) == "A" && name(7, 4) == "D" && name(1, 4) == "G♯" && name(12, 4) == "G" && name(0, 4) == nil && name(0xFF, 4) == nil)
     check("tuner filter holds the note through dropouts and strays", noteChanges == 1 && filter.note == 1)
     check("tuner filter settles near the true deviation", abs(filter.cents - (-9.8)) < 1.5 && !filter.inTune)
     check("tuner filter moves in small steps", maxStep < 1.5)
@@ -106,16 +110,30 @@ do {
         try Data(bank).write(to: URL(fileURLWithPath: args[1]))
         print("wrote \(bank.count) bytes to \(args[1])")
     case "tuner":
-        print(try pedal.tuner())
+        let t = try pedal.tuner()
+        print("firmware version \(pedal.firmwareVersion): running \(t.running), note \(t.noteName ?? "none"), \(String(format: "%+.1f", t.cents)) cents, reference \(t.referenceHz) Hz")
     case "tuner-log":
         // Samples the tuner block the way the app does (read-only). The tuner must already be on.
         let seconds = args.count > 1 ? Double(args[1]) ?? 8 : 8
+        // Prints a line only when the reading changes, with how many identical readings preceded it.
         let start = Date()
+        var last: [UInt8] = []
+        var repeats = 0, total = 0
         while Date().timeIntervalSince(start) < seconds {
             let t = try pedal.read(.dev, Address.tuner, 6)
-            print(String(format: "%6.2f  %@", Date().timeIntervalSince(start), t.hex))
-            Thread.sleep(forTimeInterval: 0.07)
+            total += 1
+            if t == last { repeats += 1 } else {
+                if !last.isEmpty && repeats > 0 { print("        (same x\(repeats))") }
+                print(String(format: "%6.2f  %@", Date().timeIntervalSince(start), t.hex))
+                last = t
+                repeats = 0
+            }
+            Thread.sleep(forTimeInterval: 0.03)
         }
+        if repeats > 0 { print("        (same x\(repeats))") }
+        print("\(total) readings")
+    case "tuner-cal":
+        runTunerCalibration(pedal: pedal, seconds: args.count > 1 ? Double(args[1]) ?? 15 : 15)
     case "check-write":
         // Confirms the write path and its acknowledgement without changing anything:
         // the playing patch's volume is written back unchanged, then compared.
@@ -124,7 +142,7 @@ do {
         let after = try pedal.editBuffer()
         print("wrote volume \(before.volume) back to the edit buffer: acknowledged, patch \(after == before ? "unchanged" : "CHANGED")")
     default:
-        print("usage: tankctl [selftest | id | state | presets | backup <file> | tuner | check-write] [--trace]")
+        print("usage: tankctl [selftest | id | state | presets | backup <file> | tuner | tuner-log [s] | tuner-cal [s] | check-write] [--trace]")
         exit(2)
     }
 } catch {

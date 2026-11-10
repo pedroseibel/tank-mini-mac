@@ -383,7 +383,7 @@ final class PedalStore: ObservableObject {
         tunerTimer?.invalidate()
         if isDemo {
             if on {
-                let sample = TunerReading(bypassVolume: 0, referenceHz: 440, running: true, note: 8, silent: false, deviation: 104)
+                let sample = TunerReading(bypassVolume: 0, referenceHz: 440, running: true, note: 7, silent: false, deviation: 104)
                 tuner = sample
                 for _ in 0..<12 { tunerDisplay.add(sample) }
             }

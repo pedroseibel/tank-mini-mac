@@ -10,7 +10,7 @@ public struct TunerReading: Equatable {
     public var bypassVolume: Int
     public var referenceHz: Int
     public var running: Bool
-    /// 0 = G#, 1 = A ... 11 = G; nil when there is no stable note.
+    /// Semitones above A: 0 = A, 1 = A♯ ... 7 = E ... 11 = G♯. Nil when there is no note.
     public var note: Int?
     public var silent: Bool
     /// Raw deviation, 127 = in tune, lower = flat.
@@ -25,7 +25,22 @@ public struct TunerReading: Equatable {
         self.deviation = deviation
     }
 
-    public static let noteNames = ["G♯", "A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G"]
+    public static let noteNames = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
+
+    /// Turn the pedal's note byte into semitones above A.
+    ///
+    /// The numbering depends on the firmware:
+    ///   - 008 (measured on a real unit): 0 = A, 1 = A♯ ... 11 = G♯. An open A string
+    ///     reads 0 and the low E string reads 7.
+    ///   - 004 (from the community notes): 1 = G♯, 2 = A ... 12 = G, and 0 means
+    ///     "signal but no stable note".
+    /// 0xFF is silence on both. Versions between the two are assumed to behave like 008.
+    public static func noteIndex(raw: UInt8, firmwareVersion: Int) -> Int? {
+        if firmwareVersion >= 5 {
+            return raw <= 11 ? Int(raw) : nil
+        }
+        return (1...12).contains(raw) ? (Int(raw) + 10) % 12 : nil
+    }
     public var noteName: String? { note.map { TunerReading.noteNames[$0] } }
     public var inTune: Bool { note != nil && (118...136).contains(deviation) }
 
@@ -106,6 +121,11 @@ public final class Pedal {
     /// Firmware name reported during the opening handshake, e.g. "TANK MINI_004".
     public private(set) var firmware = ""
 
+    /// The number at the end of the firmware name ("TANK MINI_008" -> 8); 0 if there is none.
+    public var firmwareVersion: Int {
+        Int(firmware.reversed().prefix { $0.isNumber }.reversed().map(String.init).joined()) ?? 0
+    }
+
     public init() throws {
         link = try MIDILink()
         // CoreMIDI needs a moment after the ports are connected before traffic flows,
@@ -138,14 +158,20 @@ public final class Pedal {
          UInt8(len & 0xff), UInt8((len >> 8) & 0xff), UInt8((len >> 16) & 0xff)]
     }
 
-    /// One request, sent again once if the pedal stays silent. Reads and writes here are
+    /// One request, sent again (up to three more times) if the pedal stays silent. Reads and writes here are
     /// idempotent, and a request can be lost when another program uses the port at the same moment.
     private func exchange(_ frame: Frame, matching: (Frame) -> Bool) throws -> Frame {
-        do {
-            return try link.transact(frame, timeout: 0.5, matching: matching)
-        } catch LinkError.timeout {
-            return try link.transact(frame, timeout: 1.0, matching: matching)
+        var lastError: Error = LinkError.timeout
+        for attempt in 0..<4 {
+            do {
+                return try link.transact(frame, timeout: attempt == 0 ? 0.25 : 0.5, matching: matching)
+            } catch LinkError.timeout {
+                lastError = LinkError.timeout
+                // Back off by an uneven amount so two programs do not collide again in step.
+                Thread.sleep(forTimeInterval: Double.random(in: 0.02...0.08))
+            }
         }
+        throw lastError
     }
 
     public func read(_ region: Region, _ addr: UInt32, _ len: Int) throws -> [UInt8] {
@@ -277,7 +303,7 @@ public final class Pedal {
     public func tuner() throws -> TunerReading {
         let t = try read(.dev, Address.tuner, 6)
         let ref = Int(t[1] & 0x7f) - Int(t[1] & 0x80) + 440
-        let note: Int? = (1...12).contains(Int(t[4])) ? Int(t[4]) - 1 : nil
+        let note = TunerReading.noteIndex(raw: t[4], firmwareVersion: firmwareVersion)
         return TunerReading(bypassVolume: Int(t[0]), referenceHz: ref, running: t[3] == 1,
                             note: note, silent: t[4] == 0xff, deviation: Int(t[5]))
     }
