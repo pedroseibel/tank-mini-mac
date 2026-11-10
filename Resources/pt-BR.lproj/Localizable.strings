@@ -1,0 +1,248 @@
+/* Tank Mini — Português (Brasil). Keys are the English strings used in the source. */
+
+/* Sidebar */
+"Bank %lld" = "Banco %lld";
+"Preset %@" = "Preset %@";
+"Edited" = "Editado";
+"Edited, not saved to the pedal" = "Editado, não salvo na pedaleira";
+"Not Connected" = "Não Conectada";
+"Demo" = "Demonstração";
+"Looking for the pedal…" = "Procurando a pedaleira…";
+"USB · Firmware %@" = "USB · Firmware %@";
+"Sample data, no pedal" = "Dados de exemplo, sem pedaleira";
+
+/* Window title and toolbar */
+"%@ — Edited" = "%@ — Editado";
+"Tuner" = "Afinador";
+"Bypass" = "Bypass";
+"Loopback" = "Loopback";
+"Revert" = "Reverter";
+"Save" = "Salvar";
+"Saving…" = "Salvando…";
+"More" = "Mais";
+"Save To" = "Salvar Em";
+"%@ (Current)" = "%@ (Atual)";
+"Tune your instrument" = "Afinar o instrumento";
+"Pass the dry signal through, skipping every effect" = "Deixa o sinal passar limpo, sem nenhum efeito";
+"Mix audio played by this Mac into what the pedal records over USB" = "Mistura o áudio tocado por este Mac ao que a pedaleira grava por USB";
+"Discard your changes and reload this preset from the pedal" = "Descarta as alterações e recarrega este preset da pedaleira";
+"Store this sound in preset %@ on the pedal" = "Grava este som no preset %@ da pedaleira";
+"Save to another preset, export, import" = "Salvar em outro preset, exportar, importar";
+"Export Preset…" = "Exportar Preset…";
+"Export All Presets…" = "Exportar Todos os Presets…";
+"Load Preset From File…" = "Carregar Preset de um Arquivo…";
+"Show Preset Backups in Finder" = "Mostrar Backups dos Presets no Finder";
+"Reload From Pedal" = "Recarregar da Pedaleira";
+"Dismiss" = "Fechar";
+
+/* Menu bar */
+"Pedal" = "Pedaleira";
+"Previous Preset" = "Preset Anterior";
+"Next Preset" = "Próximo Preset";
+
+/* Dialogs */
+"Switch presets without saving?" = "Trocar de preset sem salvar?";
+"Switch to %@" = "Trocar para %@";
+"Keep Editing" = "Continuar Editando";
+"Your changes to %@ have not been saved to the pedal and will be lost." = "As alterações em %@ não foram salvas na pedaleira e serão perdidas.";
+"Replace preset %@?" = "Substituir o preset %@?";
+"Replace %@" = "Substituir %@";
+"Cancel" = "Cancelar";
+"The sound you hear now will be stored in %@ on the pedal. A copy of your presets from before this session is kept on this Mac." = "O som que você está ouvindo será gravado em %@ na pedaleira. Uma cópia dos seus presets de antes desta sessão fica guardada neste Mac.";
+"Save failed: %@" = "Falha ao salvar: %@";
+"That file is not a Tank Mini preset." = "Esse arquivo não é um preset da Tank Mini.";
+
+/* Empty state */
+"Connect Your Tank Mini" = "Conecte Sua Tank Mini";
+"Plug the pedal into this Mac with a USB cable and switch it on. It is picked up automatically." = "Conecte a pedaleira a este Mac com um cabo USB e ligue-a. Ela é reconhecida automaticamente.";
+
+/* Signal chain and module inspector */
+"Signal Chain" = "Cadeia de Sinal";
+"Drag a block to change the order" = "Arraste um bloco para mudar a ordem";
+"%@ on" = "%@ ligado";
+"Position %lld of 6" = "Posição %lld de 6";
+"Model" = "Modelo";
+"Move Earlier" = "Mover para Antes";
+"Move Later" = "Mover para Depois";
+"Move earlier in the signal chain" = "Mover para antes na cadeia de sinal";
+"Move later in the signal chain" = "Mover para depois na cadeia de sinal";
+"This model has no settings." = "Este modelo não tem ajustes.";
+"Double-click to return to the saved value" = "Clique duas vezes para voltar ao valor salvo";
+"Preset Volume" = "Volume do Preset";
+
+/* Modules */
+"Dynamics" = "Dinâmica";
+"Amp" = "Amp";
+"Modulation" = "Modulação";
+"Delay" = "Delay";
+"Reverb" = "Reverb";
+"Cabinet" = "Caixa";
+
+/* Parameters */
+"Gate" = "Gate";
+"Gain" = "Ganho";
+"Sustain" = "Sustain";
+"Attack" = "Ataque";
+"Level" = "Nível";
+"Bass" = "Graves";
+"Mid" = "Médios";
+"Treble" = "Agudos";
+"Low Cut" = "Corte de Graves";
+"High Cut" = "Corte de Agudos";
+"Speed" = "Velocidade";
+"Depth" = "Profundidade";
+"Mix" = "Mix";
+"Param A" = "Parâmetro A";
+"Param B" = "Parâmetro B";
+"Feedback" = "Feedback";
+"Min" = "Mín.";
+"Max" = "Máx.";
+"Time" = "Tempo";
+"Phaser" = "Phaser";
+"Pitch" = "Tom";
+"Unpack" = "Unpack";
+"Grit" = "Sujeira";
+"T-Mode" = "Modo";
+"Decay" = "Decaimento";
+"High Pass" = "Passa-Altas";
+"Low Pass" = "Passa-Baixas";
+"Rise" = "Subida";
+"Combs" = "Combs";
+"Tone" = "Timbre";
+"Amount" = "Quantidade";
+"Diffusion" = "Difusão";
+
+/* Tuner */
+"Flat" = "Baixo";
+"Sharp" = "Alto";
+"Starting…" = "Iniciando…";
+"Play one string" = "Toque uma corda";
+"In Tune" = "Afinado";
+"Tune Up" = "Suba a Afinação";
+"Tune Down" = "Desça a Afinação";
+"Reference Pitch" = "Afinação de Referência";
+"Done" = "OK";
+"Note %@" = "Nota %@";
+"No note" = "Nenhuma nota";
+
+/* Audio interface bar */
+"Audio interface ready" = "Interface de áudio pronta";
+"macOS lists the pedal as two audio devices" = "O macOS mostra a pedaleira como dois dispositivos de áudio";
+"Audio not connected" = "Áudio não conectado";
+"Choose “%@” as input and output in your recording app. 2 in, 2 out, 44.1 kHz." = "Escolha “%@” como entrada e saída no seu app de gravação. 2 entradas, 2 saídas, 44,1 kHz.";
+"Both are named “USB-Audio”. Combine them into one “%@” device that apps can use for input and output." = "Os dois se chamam “USB-Audio”. Combine-os em um único dispositivo “%@”, que os apps podem usar para entrada e saída.";
+"macOS can’t see the pedal’s USB audio right now." = "O macOS não está vendo o áudio USB da pedaleira agora.";
+"Create Combined Device" = "Criar Dispositivo Combinado";
+"Remove Combined Device" = "Remover Dispositivo Combinado";
+"The pedal’s audio is not connected." = "O áudio da pedaleira não está conectado.";
+"macOS could not create the combined device (error %d)." = "O macOS não conseguiu criar o dispositivo combinado (erro %d).";
+"macOS could not remove the combined device (error %d)." = "O macOS não conseguiu remover o dispositivo combinado (erro %d).";
+
+/* Pedal link errors */
+"Tank Mini not found on USB" = "Tank Mini não encontrada na USB";
+"MIDI send failed (%d)" = "Falha no envio MIDI (%d)";
+"The pedal did not answer" = "A pedaleira não respondeu";
+"The pedal rejected the command (status %d)" = "A pedaleira recusou o comando (status %d)";
+"Unexpected reply: %@" = "Resposta inesperada: %@";
+
+/* Model notes */
+"Likely based on %@" = "Provavelmente baseado em: %@";
+"Possibly based on %@" = "Possivelmente baseado em: %@";
+"Not identified" = "Não identificado";
+"No notes for this model. It may be one you loaded yourself." = "Sem notas para este modelo. Pode ser um modelo que você mesmo carregou.";
+
+/* Amp models: gear */
+"gear.UK-C30Normal" = "Vox AC30, canal Normal";
+"gear.Victor_Mars" = "um cabeçote britânico da Victory ou no estilo Marshall";
+"gear.MarsFD100" = "Friedman BE-100, um projeto Marshall modificado";
+"gear.MESS_MktCln2" = "Mesa/Boogie série Mark, canal limpo";
+"gear.CA-tweed" = "um amplificador Fender tweed dos anos 1950";
+"gear.BogSV20" = "Bogner Shiva 20th Anniversary";
+"gear.Sur_SL68" = "Suhr SL68, um cabeçote no estilo Plexi";
+"gear.BassADAtube" = "pré-amplificador valvulado de baixo da ADA";
+"gear.BassAlmbic" = "pré-amplificador Alembic F-2B";
+"gear.BassTR-Trad" = "um cabeçote de baixo Trace Elliot";
+"gear.BassMarkT501" = "cabeçote valvulado Markbass TTE 501";
+
+/* Amp models: sound */
+"guide.UWE-Twins" = "Limpo americano, alto e cristalino, com muita folga. Boa base para efeitos.";
+"guide.UK-C30Normal" = "Limpo britânico brilhante, que vira um crunch estalado conforme o Ganho sobe.";
+"guide.MarsVM410" = "Marshall moderno, do crunch firme ao solo saturado.";
+"guide.Victor_Mars" = "Crunch britânico com médios fortes.";
+"guide.BritPLEX_100" = "Crunch de rock clássico: aberto, dinâmico, e limpa quando você toca mais leve.";
+"guide.MarsFD100" = "High gain britânico encorpado e modificado.";
+"guide.Eagle_SAVAGE" = "High gain alemão agressivo e firme, para bases de metal.";
+"guide.TH_DieselHgn" = "High gain moderno e denso, com graves firmes.";
+"guide.PvEV5150" = "High gain americano saturado, o som padrão de base de hard rock e metal.";
+"guide.FORTIN_CALI" = "Ganho de metal moderno, muito firme e percussivo.";
+"guide.MESS_MktCln2" = "Limpo quente e cheio, com graves firmes.";
+"guide.CA-tweed" = "Som vintage quente e cru, que satura cedo.";
+"guide.BogSV20" = "Overdrive suave e rico, com médios marcantes.";
+"guide.JUICE_JIM" = "High gain britânico encorpado, com um toque de fuzz.";
+"guide.Sur_SL68" = "Crunch Plexi refinado, claro e com punch.";
+"guide.BassADAtube" = "Timbre de baixo quente de válvula, com drive suave.";
+"guide.BassAlmbic" = "Timbre de baixo limpo e hi-fi, com graves profundos e agudos claros.";
+"guide.BassG800K_7" = "Timbre de baixo transistorizado, com punch e rosnado.";
+"guide.BassTR-Trad" = "Timbre de baixo tradicional e arredondado.";
+"guide.BassMarkT501" = "Timbre de baixo moderno, quente e claro.";
+
+/* Cabinet models: gear */
+"gear.EAGLProV30s" = "ENGL Pro 4x12 com Celestion Vintage 30";
+"gear.JUICE4x12V30" = "Orange PPC412 com Vintage 30";
+"gear.Mess Bog" = "uma mistura de caixas 4x12 Mesa/Boogie e Bogner";
+"gear.Mar960BV30" = "Marshall 1960B 4x12 com Vintage 30";
+"gear.DizzlV30" = "Diezel 4x12 com Vintage 30";
+"gear.Electrovoice" = "um alto-falante Electro-Voice EVM12L";
+"gear.MessDRectV30" = "Mesa/Boogie Rectifier 4x12 com Vintage 30";
+"gear.TwinJensenC" = "Fender Twin 2x12 com alto-falantes Jensen C12";
+"gear.FendShowman" = "caixa Fender Showman";
+"gear.UK-C30Silvers" = "Vox AC30 2x12 com alto-falantes Celestion Silver de alnico";
+"gear.BassAgula25" = "uma caixa de baixo Aguilar";
+"gear.BassJensen10" = "uma caixa de baixo com alto-falantes Jensen de 10 polegadas";
+"gear.BassFdBassman" = "caixa Fender Bassman";
+"gear.BassEDN300" = "uma caixa de baixo Eden";
+
+/* Cabinet models: sound */
+"guide.EAGLProV30s" = "Firme e focada, com a mordida de médio-agudos do Vintage 30.";
+"guide.Sperimental" = "O nome não indica um equivalente real claro. Experimente de ouvido.";
+"guide.JUICE4x12V30" = "Grande e encorpada nos médio-graves.";
+"guide.Mess Bog" = "Caixa de rock moderno, cheia e equilibrada.";
+"guide.FdChamp" = "Pequena, com som de caixinha e médios à frente.";
+"guide.FdPrJunir" = "Som brilhante e vivo de combo pequeno.";
+"guide.Mar960BV30" = "Som clássico de stack de rock, com mais mordida nos médios.";
+"guide.DizzlV30" = "Graves profundos, que continuam firmes com high gain.";
+"guide.Electrovoice" = "Limpa, de resposta ampla e com punch. Continua clara com high gain.";
+"guide.MessDRectV30" = "Graves grandes e médios agressivos, a caixa do metal moderno.";
+"guide.TwinJensenC" = "Limpo americano brilhante e cintilante.";
+"guide.TwedDlx1X12" = "Quente, solta e rica em médios.";
+"guide.FendShowman" = "Limpo grande e claro, no estilo surf.";
+"guide.J120Rolnd" = "Muito limpa e equilibrada. O par clássico para chorus.";
+"guide.UK-C30Silvers" = "Agudos brilhantes, com uma saturação suave e doce.";
+"guide.BassAgula25" = "Caixa de baixo moderna, quente e com punch.";
+"guide.BassJensen10" = "Graves vintage e firmes.";
+"guide.BassFdBassman" = "Timbre de baixo vintage e arredondado.";
+"guide.BassAmpg410" = "Baixo definido e com punch, de ataque rápido.";
+"guide.BassEDN300" = "Baixo claro e hi-fi, com agudos estendidos.";
+
+/* Effects */
+"guide.FX.Noise Gate" = "Corta chiado e ruído enquanto você não está tocando.";
+"guide.FX.Boost" = "Empurra o sinal com mais força no amplificador, para mais drive.";
+"guide.FX.Compressor" = "Iguala notas fortes e fracas e aumenta o sustain.";
+"guide.MOD.Chorus" = "Soma uma cópia levemente desafinada, para um som mais largo e cintilante.";
+"guide.MOD.Phaser" = "Varre vales pelo timbre, criando um movimento giratório.";
+"guide.MOD.Tremolo" = "Faz o volume pulsar para cima e para baixo.";
+"guide.MOD.Flanger" = "Um delay curto em varredura, com efeito de jato.";
+"guide.MOD.Vibrato" = "Faz a própria afinação oscilar.";
+"guide.MOD.Univibe" = "O giro denso e pulsante de um Uni-Vibe dos anos 1960.";
+"guide.MOD.Autofilter" = "Um filtro que varre sozinho, como um wah automático.";
+"guide.DLY.Analog" = "Repetições quentes e escuras, que somem naturalmente, como um delay analógico.";
+"guide.DLY.Duck" = "As repetições ficam baixas enquanto você toca e sobem quando você para.";
+"guide.DLY.Tape" = "Repetições de eco de fita, com oscilação e sujeira.";
+"guide.DLY.Dual" = "Duas linhas de delay ao mesmo tempo, para padrões rítmicos.";
+"guide.DLY.Lo-fi" = "Repetições degradadas e sujas.";
+"guide.REV.Room" = "Uma sala pequena: curta e natural.";
+"guide.REV.Hall" = "Um salão grande: longo e espaçoso.";
+"guide.REV.Swell" = "Reverb que cresce atrás de cada nota.";
+"guide.REV.Spring" = "O reverb de mola brilhante e respingado de um amplificador vintage.";
+"guide.REV.Shimmer" = "Soma um halo uma oitava acima à cauda do reverb.";
+"guide.REV.Cloud" = "Uma cauda longa e difusa, para sons ambientes.";
