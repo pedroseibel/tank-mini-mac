@@ -1,48 +1,64 @@
 import SwiftUI
 import TankMiniCore
 
+/// The tuner sheet. It draws the steadied reading from `PedalStore.tunerDisplay`
+/// (see `TunerFilter`), never the pedal's raw stream.
 struct TunerView: View {
     @EnvironmentObject var store: PedalStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        let reading = store.tuner
-        let offset = reading.flatMap { $0.note == nil ? nil : Double($0.deviation - 127) }
-        let inTune = reading?.inTune ?? false
+        let display = store.tunerDisplay
+        let hasNote = display.note != nil
+        let inTune = display.inTune
+        let position = min(max(display.cents / 50, -1), 1) // -1 = 50 cents flat, +1 = 50 cents sharp
 
-        VStack(spacing: 20) {
-            Text(reading?.noteName ?? "–")
-                .font(.system(size: 88, weight: .semibold, design: .rounded))
-                .foregroundStyle(inTune ? AnyShapeStyle(.green) : AnyShapeStyle(.primary))
-                .frame(height: 96)
-                .accessibilityLabel(Text(verbatim: reading?.noteName.map { String(localized: "Note \($0)") } ?? String(localized: "No note")))
+        VStack(spacing: 18) {
+            VStack(spacing: 0) {
+                Text(verbatim: display.noteName ?? "–")
+                    .font(.system(size: 88, weight: .semibold, design: .rounded))
+                    .foregroundStyle(inTune ? AnyShapeStyle(.green) : AnyShapeStyle(.primary))
+                    .frame(height: 96)
+                    .accessibilityLabel(Text(verbatim: display.noteName.map { String(localized: "Note \($0)") } ?? String(localized: "No note")))
+                // Fixed-width digits so the number does not shift as it changes.
+                Text(verbatim: hasNote ? centsText(display.cents) : " ")
+                    .font(.title3.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(!hasNote)
+            }
 
             VStack(spacing: 8) {
                 // Deviation meter: centre is in tune, left is flat, right is sharp.
                 GeometryReader { geo in
                     let w = geo.size.width
-                    let clamped = min(max((offset ?? 0) / 60, -1), 1)
                     ZStack {
                         Capsule().fill(Color.primary.opacity(0.10)).frame(height: 4)
-                        Capsule().fill(Color.green.opacity(0.35)).frame(width: w * 0.15, height: 4)
-                        if offset != nil {
+                        // In-tune window: 3 cents either side of centre.
+                        Capsule().fill(Color.green.opacity(0.35)).frame(width: max(10, w * 0.06), height: 4)
+                        ForEach([-1.0, -0.5, 0.5, 1.0], id: \.self) { tick in
                             Capsule()
-                                .fill(inTune ? AnyShapeStyle(.green) : AnyShapeStyle(.primary))
-                                .frame(width: 4, height: 22)
-                                .offset(x: clamped * (w / 2 - 2))
-                                // The needle is a live meter: follow the reading closely, never lag it.
-                                .animation(reduceMotion ? nil : .easeOut(duration: 0.08), value: clamped)
+                                .fill(Color.primary.opacity(0.25))
+                                .frame(width: 1.5, height: 10)
+                                .offset(x: tick * (w / 2 - 2))
                         }
+                        Capsule()
+                            .fill(inTune ? AnyShapeStyle(.green) : AnyShapeStyle(.primary))
+                            .frame(width: 4, height: 26)
+                            .offset(x: position * (w / 2 - 2))
+                            .opacity(hasNote ? 1 : 0)
+                            // A spring with no bounce: it retargets smoothly as readings arrive,
+                            // so the needle glides instead of stepping.
+                            .animation(reduceMotion ? nil : .spring(duration: 0.3, bounce: 0), value: position)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .frame(height: 24)
+                .frame(height: 28)
                 .accessibilityHidden(true)
 
                 HStack {
                     Text("Flat")
                     Spacer()
-                    Text(verbatim: statusText(reading, inTune: inTune))
+                    Text(verbatim: statusText(display))
                         .fontWeight(.medium)
                         .foregroundStyle(inTune ? AnyShapeStyle(.green) : AnyShapeStyle(.secondary))
                     Spacer()
@@ -55,9 +71,9 @@ struct TunerView: View {
             Divider()
 
             HStack {
-                Stepper(value: Binding(get: { reading?.referenceHz ?? 440 }, set: { store.setTunerReference($0) }), in: 430...450) {
+                Stepper(value: Binding(get: { store.tuner?.referenceHz ?? 440 }, set: { store.setTunerReference($0) }), in: 430...450) {
                     LabeledContent("Reference Pitch") {
-                        Text("\(reading?.referenceHz ?? 440) Hz").monospacedDigit()
+                        Text(verbatim: "\(store.tuner?.referenceHz ?? 440) Hz").monospacedDigit()
                     }
                 }
                 .fixedSize()
@@ -70,10 +86,17 @@ struct TunerView: View {
         .frame(width: 400)
     }
 
-    private func statusText(_ reading: TunerReading?, inTune: Bool) -> String {
-        guard let reading else { return String(localized: "Starting…") }
-        if reading.note == nil { return String(localized: "Play one string") }
-        if inTune { return String(localized: "In Tune") }
-        return reading.deviation < 127 ? String(localized: "Tune Up") : String(localized: "Tune Down")
+    private func centsText(_ cents: Double) -> String {
+        let rounded = Int(cents.rounded())
+        if rounded == 0 { return String(localized: "0 cents") }
+        // A real minus sign, and an explicit plus, so flat and sharp read at a glance.
+        return String(localized: "\(rounded > 0 ? "+" : "−")\(abs(rounded)) cents")
+    }
+
+    private func statusText(_ display: TunerFilter) -> String {
+        if store.tuner == nil { return String(localized: "Starting…") }
+        if display.note == nil { return String(localized: "Play one string") }
+        if display.inTune { return String(localized: "In Tune") }
+        return display.cents < 0 ? String(localized: "Tune Up") : String(localized: "Tune Down")
     }
 }

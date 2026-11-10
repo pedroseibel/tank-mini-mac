@@ -268,3 +268,7 @@
 "Backup folder" = "Pasta de backups";
 "Show in Finder" = "Mostrar no Finder";
 "The sound you hear now will be stored in %@ on the pedal, replacing what is there." = "O som que você está ouvindo será gravado em %@ na pedaleira, substituindo o que está lá.";
+
+/* Tuner readout */
+"0 cents" = "0 cents";
+"%@%lld cents" = "%@%lld cents";

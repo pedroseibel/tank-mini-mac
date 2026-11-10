@@ -63,6 +63,8 @@ final class PedalStore: ObservableObject {
     @Published var saving = false
     @Published var tunerOn = false
     @Published var tuner: TunerReading?
+    /// The steadied note and deviation that the tuner window draws.
+    @Published var tunerDisplay = TunerFilter()
 
     /// Settings the pedal loaded when a module's model was last changed in this session,
     /// kept so a knob can be reset even when the model differs from the saved preset.
@@ -377,23 +379,31 @@ final class PedalStore: ObservableObject {
         guard tunerOn != on else { return }
         tunerOn = on
         tuner = nil
+        tunerDisplay.reset()
         tunerTimer?.invalidate()
         if isDemo {
-            if on { tuner = TunerReading(bypassVolume: 0, referenceHz: 440, running: true, note: 8, silent: false, deviation: 121) }
+            if on {
+                let sample = TunerReading(bypassVolume: 0, referenceHz: 440, running: true, note: 8, silent: false, deviation: 104)
+                tuner = sample
+                for _ in 0..<12 { tunerDisplay.add(sample) }
+            }
             return
         }
         io.run({ try $0.setTuner(on) }, then: { [weak self] result in
             if case .failure(let error) = result { self?.handle(error) }
         })
         guard on else { return }
-        tunerTimer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { [weak self] _ in
+        tunerTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self, self.tunerOn, !self.tunerRequestInFlight else { return }
                 self.tunerRequestInFlight = true
                 self.io.run({ try $0.tuner() }, then: { [weak self] result in
                     guard let self else { return }
                     self.tunerRequestInFlight = false
-                    if case .success(let reading) = result, self.tunerOn { self.tuner = reading }
+                    if case .success(let reading) = result, self.tunerOn {
+                        if self.tuner != reading { self.tuner = reading }
+                        self.tunerDisplay.add(reading)
+                    }
                 })
             }
         }

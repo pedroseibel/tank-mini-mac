@@ -23,6 +23,30 @@ func selftest() -> Bool {
     p.setParam(5, 5, 77); p.volume = 90; p.chain = [5, 4, 3, 2, 1, 0]
     check("patch accessors", p.param(5, 5) == 77 && p.bytes[90] == 77 && p.volume == 90 && p.chain == [5, 4, 3, 2, 1, 0])
     check("bank size", Bank.size == 1942 && Bank.slotName(20) == "7C" && Bank.slotName(0) == "1A")
+    // Tuner filter: a noisy stream around A, 10 cents flat, with dropouts and stray notes.
+    func reading(_ note: Int?, _ deviation: Int) -> TunerReading {
+        TunerReading(bypassVolume: 0, referenceHz: 440, running: true, note: note, silent: false, deviation: deviation)
+    }
+    var filter = TunerFilter()
+    var t = Date()
+    var noteChanges = 0, lastNote: Int? = nil, maxStep = 0.0, lastCents = 0.0
+    let jitter = [0, 6, -5, 3, -8, 7, -2, 9, -6, 1]
+    for i in 0..<200 {
+        t = t.addingTimeInterval(0.04)
+        let raw: TunerReading
+        if i % 23 == 5 { raw = reading(nil, 0) }            // dropout
+        else if i % 31 == 7 { raw = reading(2, 200) }       // one stray neighbouring note
+        else { raw = reading(1, 127 - 25 + jitter[i % 10]) } // A, about 10 cents flat
+        filter.add(raw, at: t)
+        if filter.note != lastNote { noteChanges += 1; lastNote = filter.note }
+        if i > 20 { maxStep = max(maxStep, abs(filter.cents - lastCents)) }
+        lastCents = filter.cents
+    }
+    check("tuner filter holds the note through dropouts and strays", noteChanges == 1 && filter.note == 1)
+    check("tuner filter settles near the true deviation", abs(filter.cents - (-9.8)) < 1.5 && !filter.inTune)
+    check("tuner filter moves in small steps", maxStep < 1.5)
+    for _ in 0..<40 { t = t.addingTimeInterval(0.04); filter.add(reading(nil, 0), at: t) }
+    check("tuner filter clears after silence", filter.note == nil)
     return ok
 }
 
@@ -83,6 +107,15 @@ do {
         print("wrote \(bank.count) bytes to \(args[1])")
     case "tuner":
         print(try pedal.tuner())
+    case "tuner-log":
+        // Samples the tuner block the way the app does (read-only). The tuner must already be on.
+        let seconds = args.count > 1 ? Double(args[1]) ?? 8 : 8
+        let start = Date()
+        while Date().timeIntervalSince(start) < seconds {
+            let t = try pedal.read(.dev, Address.tuner, 6)
+            print(String(format: "%6.2f  %@", Date().timeIntervalSince(start), t.hex))
+            Thread.sleep(forTimeInterval: 0.07)
+        }
     case "check-write":
         // Confirms the write path and its acknowledgement without changing anything:
         // the playing patch's volume is written back unchanged, then compared.

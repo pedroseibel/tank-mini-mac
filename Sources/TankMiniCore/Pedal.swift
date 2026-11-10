@@ -28,6 +28,75 @@ public struct TunerReading: Equatable {
     public static let noteNames = ["G♯", "A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G"]
     public var noteName: String? { note.map { TunerReading.noteNames[$0] } }
     public var inTune: Bool { note != nil && (118...136).contains(deviation) }
+
+    /// Deviation in cents. The raw byte runs 0...254 around a centre of 127 and the official
+    /// app draws it on a scale of -50...+50 cents, so one step is about 0.4 cent.
+    public var cents: Double { Double(deviation - 127) * 50.0 / 127.0 }
+}
+
+/// Steadies the pedal's raw tuner readings so they can be read while tuning.
+///
+/// The pedal reports a note and a deviation many times a second, and the raw stream
+/// flickers: the note drops out between plucks or jumps to a neighbour for one reading,
+/// and the deviation jitters. This filter
+///   - changes the shown note only after the new note is seen several times in a row,
+///   - keeps the last note briefly when the signal drops out,
+///   - takes the median of recent deviations, then eases toward it,
+///   - switches "in tune" on inside a narrow window and off outside a wider one.
+public struct TunerFilter {
+    public private(set) var note: Int?
+    public private(set) var cents: Double = 0
+    public private(set) var inTune = false
+
+    private var candidate: Int?
+    private var candidateCount = 0
+    private var recent: [Double] = []
+    private var lastHeard = Date.distantPast
+
+    public init() {}
+
+    public mutating func add(_ reading: TunerReading, at now: Date = Date()) {
+        guard let heard = reading.note else {
+            candidate = nil
+            candidateCount = 0
+            if now.timeIntervalSince(lastHeard) > 0.7 { reset() }
+            return
+        }
+        lastHeard = now
+        if heard == note {
+            candidate = nil
+            candidateCount = 0
+            recent.append(reading.cents)
+            if recent.count > 7 { recent.removeFirst() }
+            let target = recent.sorted()[recent.count / 2]
+            cents += (target - cents) * 0.35
+        } else {
+            if heard == candidate { candidateCount += 1 } else { candidate = heard; candidateCount = 1 }
+            // A first note appears quickly; replacing a note already shown takes longer.
+            if candidateCount >= (note == nil ? 2 : 4) {
+                note = heard
+                recent = [reading.cents]
+                cents = reading.cents
+                candidate = nil
+                candidateCount = 0
+                inTune = false
+            }
+        }
+        if note != nil {
+            if abs(cents) <= 3 { inTune = true } else if abs(cents) > 5 { inTune = false }
+        }
+    }
+
+    public mutating func reset() {
+        note = nil
+        cents = 0
+        inTune = false
+        recent = []
+        candidate = nil
+        candidateCount = 0
+    }
+
+    public var noteName: String? { note.map { TunerReading.noteNames[$0] } }
 }
 
 /// High-level commands. All calls block until the pedal answers; call them off the main thread.
@@ -57,7 +126,7 @@ public final class Pedal {
     // MARK: raw access
 
     public func identity(timeout: TimeInterval = 1.0) throws -> String {
-        let reply = try link.transact(Frame(cmd: Command.identity), timeout: timeout)
+        let reply = try link.transact(Frame(cmd: Command.identity), timeout: timeout) { $0.cmd == Command.identity }
         guard reply.cmd == Command.identity else { throw LinkError.unexpectedReply(reply.bytes.hex) }
         let name = reply.body.prefix { $0 != 0 }
         return String(decoding: name, as: UTF8.self)
@@ -69,9 +138,23 @@ public final class Pedal {
          UInt8(len & 0xff), UInt8((len >> 8) & 0xff), UInt8((len >> 16) & 0xff)]
     }
 
+    /// One request, sent again once if the pedal stays silent. Reads and writes here are
+    /// idempotent, and a request can be lost when another program uses the port at the same moment.
+    private func exchange(_ frame: Frame, matching: (Frame) -> Bool) throws -> Frame {
+        do {
+            return try link.transact(frame, timeout: 0.5, matching: matching)
+        } catch LinkError.timeout {
+            return try link.transact(frame, timeout: 1.0, matching: matching)
+        }
+    }
+
     public func read(_ region: Region, _ addr: UInt32, _ len: Int) throws -> [UInt8] {
         let head = header(region, addr, len)
-        let reply = try link.transact(Frame(cmd: Command.read, body: head))
+        let reply = try exchange(Frame(cmd: Command.read, body: head)) { reply in
+            // Our data (the pedal echoes the request header), or a refusal.
+            (reply.cmd == Command.read && Array(reply.body.prefix(head.count)) == head)
+                || (reply.cmd == Command.ack && reply.body.first != 0)
+        }
         if reply.cmd == Command.ack { throw LinkError.rejected(reply.body.first ?? 0xff) }
         guard reply.cmd == Command.read, reply.body.count == head.count + len, Array(reply.body.prefix(head.count)) == head else {
             throw LinkError.unexpectedReply(reply.bytes.prefix(24).map { String(format: "%02X", $0) }.joined(separator: " "))
@@ -80,7 +163,7 @@ public final class Pedal {
     }
 
     public func write(_ region: Region, _ addr: UInt32, _ data: [UInt8]) throws {
-        let reply = try link.transact(Frame(cmd: Command.write, body: header(region, addr, data.count) + data))
+        let reply = try exchange(Frame(cmd: Command.write, body: header(region, addr, data.count) + data)) { $0.cmd == Command.ack }
         guard reply.cmd == Command.ack else { throw LinkError.unexpectedReply(reply.bytes.hex) }
         guard reply.body.first == 0 else { throw LinkError.rejected(reply.body.first ?? 0xff) }
     }

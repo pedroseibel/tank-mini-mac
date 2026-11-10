@@ -149,7 +149,11 @@ public final class MIDILink {
 
     /// Send one frame and wait for the pedal's reply. Safe to call from any thread
     /// except the CoreMIDI callback; calls are serialised.
-    public func transact(_ frame: Frame, timeout: TimeInterval = 1.0) throws -> Frame {
+    ///
+    /// The MIDI port is shared: if another program is talking to the pedal, its replies
+    /// arrive here too. `matching` says which reply belongs to this request; anything
+    /// else is skipped.
+    public func transact(_ frame: Frame, timeout: TimeInterval = 1.0, matching: (Frame) -> Bool = { _ in true }) throws -> Frame {
         txLock.lock()
         defer { txLock.unlock() }
 
@@ -163,10 +167,12 @@ public final class MIDILink {
         let deadline = Date().addingTimeInterval(timeout)
         rx.lock()
         defer { rx.unlock() }
-        while inbox.isEmpty {
-            if !rx.wait(until: deadline) { break }
+        while true {
+            while let reply = inbox.first {
+                inbox.removeFirst()
+                if matching(reply) { return reply }
+            }
+            if !rx.wait(until: deadline) { throw LinkError.timeout }
         }
-        guard !inbox.isEmpty else { throw LinkError.timeout }
-        return inbox.removeFirst()
     }
 }
