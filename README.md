@@ -7,7 +7,7 @@ Unofficial: not made by or affiliated with M-VAVE.
 
 [Português (Brasil)](README.pt-BR.md)
 
-![The app with a pedal connected](screenshots/main-dark.png)
+![The app with a pedal connected, shown in Portuguese](screenshots/app.webp)
 
 ## What it does
 
@@ -20,6 +20,10 @@ Unofficial: not made by or affiliated with M-VAVE.
 - **Preset files**: export and load `.tkm` presets and `.atkm` banks, the same formats the official app uses.
 - **Audio interface fix**: one click creates a combined “Tank Mini” audio device (see below).
 - English and Brazilian Portuguese, light and dark mode.
+
+In English and light mode:
+
+![The app in English, light mode](screenshots/main-light.png)
 
 ## The audio interface problem
 

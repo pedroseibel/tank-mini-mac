@@ -7,7 +7,7 @@ Não oficial: não é feito pela M-VAVE nem tem vínculo com ela.
 
 [English](README.md)
 
-![O app com a pedaleira conectada](screenshots/main-pt-BR.png)
+![O app com a pedaleira conectada](screenshots/app.webp)
 
 ## O que ele faz
 
