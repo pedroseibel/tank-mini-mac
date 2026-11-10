@@ -110,3 +110,7 @@ seus donos e aparecem só para descrever um som.
 | `Sources/tankctl` | Ferramenta de linha de comando, só leitura |
 | `Resources` | Ícone do app e traduções |
 | `Tools` | Gerador do ícone e as sondas de áudio USB / MIDI usadas no desenvolvimento |
+
+## Licença
+
+[MIT](LICENSE)

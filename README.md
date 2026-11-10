@@ -108,3 +108,7 @@ lines are read from the pedal's own abbreviated model names, so each is marked *
 | `Sources/tankctl` | Read-only command-line tool |
 | `Resources` | App icon and translations |
 | `Tools` | Icon generator and the USB audio / MIDI probes used during development |
+
+## License
+
+[MIT](LICENSE)
