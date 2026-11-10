@@ -19,6 +19,7 @@ Não oficial: não é feito pela M-VAVE nem tem vínculo com ela.
 - **Afinador**, **Bypass**, **Loopback USB**.
 - **Arquivos de preset**: exporte e carregue presets `.tkm` e bancos `.atkm`, os mesmos formatos do app oficial.
 - **Correção da interface de áudio**: um clique cria um dispositivo de áudio combinado “Tank Mini” (veja abaixo).
+- **Ajustes** (Command-vírgula): tema (sistema, claro, escuro), idioma (sistema, inglês, português), notas dos modelos ligadas ou desligadas, a pergunta sobre alterações não salvas e o backup automático dos presets.
 - Inglês e português do Brasil, modo claro e escuro.
 
 ## O problema da interface de áudio

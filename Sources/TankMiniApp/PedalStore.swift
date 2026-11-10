@@ -164,7 +164,9 @@ final class PedalStore: ObservableObject {
         stored = snap.stored
         patch = snap.patch
         notice = nil
-        Backups.saveIfChanged(bank: snap.stored.flatMap(\.bytes) + Bank.trailer)
+        if AppSettings.automaticBackupsEnabled {
+            Backups.saveIfChanged(bank: snap.stored.flatMap(\.bytes) + Bank.trailer)
+        }
     }
 
     private func handle(_ error: Error) {

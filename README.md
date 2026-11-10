@@ -19,6 +19,7 @@ Unofficial: not made by or affiliated with M-VAVE.
 - **Tuner**, **Bypass**, **USB Loopback**.
 - **Preset files**: export and load `.tkm` presets and `.atkm` banks, the same formats the official app uses.
 - **Audio interface fix**: one click creates a combined “Tank Mini” audio device (see below).
+- **Settings** (Command-comma): theme (system, light, dark), language (system, English, Portuguese), model notes on or off, the unsaved-changes prompt, and automatic preset backups.
 - English and Brazilian Portuguese, light and dark mode.
 
 In English and light mode:

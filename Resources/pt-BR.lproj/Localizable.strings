@@ -246,3 +246,25 @@
 "guide.REV.Spring" = "O reverb de mola brilhante e respingado de um amplificador vintage.";
 "guide.REV.Shimmer" = "Soma um halo uma oitava acima à cauda do reverb.";
 "guide.REV.Cloud" = "Uma cauda longa e difusa, para sons ambientes.";
+
+/* Settings */
+"Settings…" = "Ajustes…";
+"Appearance" = "Aparência";
+"Theme" = "Tema";
+"System" = "Sistema";
+"Light" = "Claro";
+"Dark" = "Escuro";
+"Language" = "Idioma";
+"Reopen Tank Mini to change the language." = "Reabra o Tank Mini para trocar o idioma.";
+"Relaunch Now" = "Reabrir Agora";
+"Editing" = "Edição";
+"Show notes about each model" = "Mostrar notas sobre cada modelo";
+"Says which amp or cabinet a model appears to be based on." = "Indica em qual amplificador ou caixa o modelo parece se basear.";
+"Ask before discarding unsaved changes" = "Perguntar antes de descartar alterações não salvas";
+"When you switch presets with edits that are not saved to the pedal." = "Ao trocar de preset com edições que não foram salvas na pedaleira.";
+"Backups" = "Backups";
+"Back up presets automatically" = "Fazer backup dos presets automaticamente";
+"Copies all 21 presets to this Mac whenever they have changed on the pedal." = "Copia os 21 presets para este Mac sempre que eles mudarem na pedaleira.";
+"Backup folder" = "Pasta de backups";
+"Show in Finder" = "Mostrar no Finder";
+"The sound you hear now will be stored in %@ on the pedal, replacing what is there." = "O som que você está ouvindo será gravado em %@ na pedaleira, substituindo o que está lá.";

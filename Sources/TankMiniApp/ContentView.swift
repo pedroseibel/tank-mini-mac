@@ -4,6 +4,7 @@ import TankMiniCore
 struct ContentView: View {
     @EnvironmentObject var store: PedalStore
     @EnvironmentObject var audio: AudioSetup
+    @EnvironmentObject var settings: AppSettings
 
     // Declared without the @State attribute: on this SDK it is a compiler macro whose plugin
     // ships only with full Xcode, and this project builds with the Command Line Tools alone.
@@ -42,13 +43,17 @@ struct ContentView: View {
             Button("Replace \(Bank.slotName(slot))", role: .destructive) { store.save(to: slot) }
             Button("Cancel", role: .cancel) {}
         } message: { slot in
-            Text("The sound you hear now will be stored in \(Bank.slotName(slot)) on the pedal. A copy of your presets from before this session is kept on this Mac.")
+            if settings.automaticBackups {
+                Text("The sound you hear now will be stored in \(Bank.slotName(slot)) on the pedal. A copy of your presets from before this session is kept on this Mac.")
+            } else {
+                Text("The sound you hear now will be stored in \(Bank.slotName(slot)) on the pedal, replacing what is there.")
+            }
         }
     }
 
     private func requestSelect(_ slot: Int) {
         if slot == store.activeSlot { return }
-        if store.isDirty { pendingSlot = slot } else { store.select(slot) }
+        if store.isDirty && settings.confirmDiscard { pendingSlot = slot } else { store.select(slot) }
     }
 }
 
@@ -251,6 +256,8 @@ struct DetailView: View {
                         NSWorkspace.shared.open(Backups.folder)
                     }
                     Button("Reload From Pedal") { store.reload() }
+                    Divider()
+                    SettingsLink { Text("Settings…") }
                 } label: {
                     Label("More", systemImage: "ellipsis.circle")
                 }
@@ -383,6 +390,7 @@ struct ChainTile: View {
 
 struct ModuleInspector: View {
     @EnvironmentObject var store: PedalStore
+    @EnvironmentObject var settings: AppSettings
     let patch: Patch
     let module: Module
 
@@ -428,7 +436,9 @@ struct ModuleInspector: View {
                         .labelsHidden()
                 }
 
-                ModelNoteView(module: module, modelName: store.modelName(module, in: patch))
+                if settings.showModelNotes {
+                    ModelNoteView(module: module, modelName: store.modelName(module, in: patch))
+                }
 
                 if names.isEmpty {
                     Text("This model has no settings.")

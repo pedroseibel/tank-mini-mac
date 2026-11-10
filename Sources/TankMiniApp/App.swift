@@ -5,7 +5,7 @@ import TankMiniCore
 // Launch options:
 //   --demo                 run with built-in sample data instead of a pedal
 //   --snapshot <file.png>  render the window to an image and quit (used for checking the layout)
-//   --tuner                with --snapshot: render the tuner instead of the main window
+//   --tuner / --settings   with --snapshot: render the tuner or the Settings window instead
 //   --light / --dark       with --snapshot: force an appearance
 let launchArguments = CommandLine.arguments
 let demoMode = launchArguments.contains("--demo")
@@ -14,10 +14,12 @@ let demoMode = launchArguments.contains("--demo")
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = PedalStore(demo: demoMode)
     let audio = AudioSetup(demo: demoMode)
+    let settings = AppSettings()
     private var snapshotWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        settings.applyTheme()
         if let i = launchArguments.firstIndex(of: "--snapshot"), launchArguments.count > i + 1 {
             snapshot(to: launchArguments[i + 1])
             return
@@ -33,12 +35,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func snapshot(to path: String) {
         for window in NSApp.windows { window.orderOut(nil) }
-        let tunerShot = launchArguments.contains("--tuner")
-        if tunerShot { store.setTuner(true) }
-        let size = tunerShot ? NSSize(width: 400, height: 330) : NSSize(width: 1100, height: 700)
-        let root: AnyView = tunerShot
-            ? AnyView(TunerView().environmentObject(store).environmentObject(audio))
-            : AnyView(ContentView().environmentObject(store).environmentObject(audio))
+        let settingsShot = launchArguments.contains("--settings")
+        let tunerShot = launchArguments.contains("--tuner") || settingsShot
+        if launchArguments.contains("--tuner") { store.setTuner(true) }
+        let size = settingsShot ? NSSize(width: 480, height: 470)
+            : tunerShot ? NSSize(width: 400, height: 330) : NSSize(width: 1100, height: 700)
+        let root: AnyView = settingsShot ? AnyView(SettingsView().environmentObject(settings))
+            : tunerShot ? AnyView(TunerView().environmentObject(store).environmentObject(audio))
+            : AnyView(ContentView().environmentObject(store).environmentObject(audio).environmentObject(settings))
         let controller = NSHostingController(rootView: root)
         controller.sceneBridgingOptions = [.all] // carry the SwiftUI toolbar and title into the window
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
@@ -74,6 +78,7 @@ struct TankMiniApp: App {
             ContentView()
                 .environmentObject(delegate.store)
                 .environmentObject(delegate.audio)
+                .environmentObject(delegate.settings)
                 .frame(minWidth: 940, minHeight: 600)
         }
         .defaultSize(width: 1100, height: 700)
@@ -93,6 +98,11 @@ struct TankMiniApp: App {
                 Button("Reload From Pedal") { delegate.store.reload() }
                     .keyboardShortcut("r", modifiers: .command)
             }
+        }
+
+        Settings {
+            SettingsView()
+                .environmentObject(delegate.settings)
         }
     }
 }
